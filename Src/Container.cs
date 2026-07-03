@@ -8,7 +8,7 @@ public sealed class Container : IContainer
 {
     private readonly ImmutableDictionary<Type, ServiceDescriptor> _descriptors;
     private readonly ConcurrentDictionary<Type, Func<IScope, HashSet<Type>, object>> _cachedActivators;
-    private readonly List<IScope> _disposedScope;
+    private readonly HashSet<IScope> _disposedScope;
     private readonly Scope _rootScope;
 
     public Container(in IEnumerable<ServiceDescriptor> descriptors)

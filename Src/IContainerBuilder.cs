@@ -2,6 +2,6 @@
 
 public interface IContainerBuilder
 {
-    void Register(ServiceDescriptor serviceDescriptor);
+    void Register(in ServiceDescriptor serviceDescriptor);
     IContainer Build();
 }

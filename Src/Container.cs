@@ -42,7 +42,7 @@ public sealed class Container : IContainer
         return _rootScope.DisposeAsync();
     }
 
-    private Func<IScope, HashSet<Type>, object> BuildActivation(Type service)
+    private Func<IScope, HashSet<Type>, object> BuildActivation(in Type service)
     {
         if (!_descriptors.TryGetValue(service, out var descriptor))
             throw new InvalidOperationException($"Service: {service.Name} not found");
@@ -67,7 +67,7 @@ public sealed class Container : IContainer
         };
     }
 
-    private object CreateInstance(in Type service, in IScope scope, HashSet<Type> resolvingTypes)
+    private object CreateInstance(in Type service, in IScope scope, in HashSet<Type> resolvingTypes)
     {
         if (!resolvingTypes.Add(service))
         {
@@ -150,7 +150,7 @@ public sealed class Container : IContainer
                 return _container._rootScope.ResolveInternal(serviceType, resolvingTypes);
         }
 
-        private object CreateInstanceInternal(Type serviceType, HashSet<Type> resolvingTypes)
+        private object CreateInstanceInternal(in Type serviceType, in HashSet<Type> resolvingTypes)
         {
             object service = _container.CreateInstance(serviceType, this, resolvingTypes);
 

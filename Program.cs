@@ -5,7 +5,8 @@ var controller = new Controller(service);
 
 IContainerBuilder builder = new ContainerBuilder();
 
-using (IContainer container = builder.RegisterSingleton<IService, Service>()
+using (IContainer container = builder
+    .RegisterScoped<IService, Service>()
     .Build())
 {
     IScope scope = container.CreateScope();

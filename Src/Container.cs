@@ -8,7 +8,7 @@ public sealed class Container : IContainer
 {
     private readonly ImmutableDictionary<Type, ServiceDescriptor> _descriptors;
     private readonly ConcurrentDictionary<Type, Func<IScope, HashSet<Type>, object>> _cachedActivators;
-    private readonly Stack<IScope> _disposedScope;
+    private readonly List<IScope> _disposedScope;
     private readonly Scope _rootScope;
 
     public Container(in IEnumerable<ServiceDescriptor> descriptors)
@@ -22,24 +22,33 @@ public sealed class Container : IContainer
     public IScope CreateScope()
     {
         IScope scope = new Scope(this);
-        _disposedScope.Push(scope);
+        _disposedScope.Add(scope);
         return scope;
     }
 
     public void Dispose()
     {
-        foreach (var scope in _disposedScope)
-            scope.Dispose();
+        if (_disposedScope.Count > 0)
+        {
+            foreach (var scope in _disposedScope)
+                scope.Dispose();
+        }
 
         _rootScope.Dispose();
     }
 
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
-        foreach (var scope in _disposedScope)
-            scope.DisposeAsync();
+        if (_disposedScope.Count > 0)
+        {
+            foreach (var scope in _disposedScope)
+            {
+                await scope.DisposeAsync();
+                scope.Dispose();
+            }
+        }
 
-        return _rootScope.DisposeAsync();
+        await _rootScope.DisposeAsync();
     }
 
     private Func<IScope, HashSet<Type>, object> BuildActivation(in Type service)

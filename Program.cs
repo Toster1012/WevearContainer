@@ -1,12 +1,10 @@
 ﻿using Wevear;
 
 var service = new Service();
-var controller = new Controller(service);
-
 IContainerBuilder builder = new ContainerBuilder();
 
-using (IContainer container = builder
-    .RegisterScoped<IService, Service>()
+await using (IContainer container = builder
+    .RegisterTransient<IService, Service>()
     .Build())
 {
     IScope scope = container.CreateScope();
@@ -24,31 +22,22 @@ using (IContainer container = builder
 
 Console.ReadKey();
 
-class Controller(IService service)
-{
-    private readonly IService _service = service;
-
-    public void Do() { }
-}
-
-interface IHelper
+interface IService : IDisposable, IAsyncDisposable
 {
 
 }
 
-class Helper : IHelper
-{
-
-}
-
-interface IService : IDisposable
-{
-
-}
 class Service : IService
 {
     public void Dispose()
     {
         Console.WriteLine("Services disposed");
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        Console.WriteLine("Services async disposed");
+
+        return default;
     }
 }

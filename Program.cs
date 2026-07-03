@@ -4,7 +4,7 @@ var service = new Service();
 var controller = new Controller(service);
 
 IContainerBuilder builder = new ContainerBuilder();
-IContainer container = builder.RegisterScoped<IService, Service>()
+IContainer container = builder.RegisterSingleton<IService, Service>()
     .Build();
 
 IScope scope = container.CreateScope();

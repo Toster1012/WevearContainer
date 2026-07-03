@@ -11,5 +11,6 @@ public sealed class ContainerBuilder : IContainerBuilder
 
     public IContainer Build()
     {
+        return new Container(_descriptors);
     }
 }

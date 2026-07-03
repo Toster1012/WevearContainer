@@ -4,9 +4,13 @@ var service = new Service();
 var controller = new Controller(service);
 
 IContainerBuilder builder = new ContainerBuilder();
-builder.RegisterSingleton<IService, Service>()
-    .RegisterTransient<IHelper, Helper>()
+IContainer container = builder.RegisterSingleton<IService, Service>()
     .Build();
+
+IScope scope = container.CreateScope();
+
+Console.WriteLine(scope.Resolve<IService>() == null);
+Console.ReadKey();
 
 class Controller(IService service)
 {

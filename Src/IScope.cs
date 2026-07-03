@@ -2,6 +2,6 @@
 
 public interface IScope
 {
-    object Resolve(Type serviceType);
+    object Resolve(in Type serviceType);
     T Resolve<T>();
 }

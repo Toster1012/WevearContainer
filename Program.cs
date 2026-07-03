@@ -29,11 +29,11 @@ interface IHelper
 {
 
 }
+
 class Helper : IHelper
 {
 
 }
-
 
 interface IService
 {

@@ -1,4 +1,6 @@
-﻿interface IContainer
+﻿namespace Wevear;
+
+public interface IContainer
 {
 
 }

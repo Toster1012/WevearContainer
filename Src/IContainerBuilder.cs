@@ -1,5 +1,7 @@
-﻿interface IContainerBuilder
+﻿namespace Wevear;
+
+public interface IContainerBuilder
 {
-    void Register();
+    void Register(ServiceDescriptor serviceDescriptor);
     IContainer Build();
 }

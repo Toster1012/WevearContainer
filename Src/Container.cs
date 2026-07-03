@@ -8,11 +8,13 @@ public sealed class Container : IContainer
 {
     private readonly ImmutableDictionary<Type, ServiceDescriptor> _descriptors;
     private readonly ConcurrentDictionary<Type, Func<IScope, object>> _cachedActivators;
+    private readonly Scope _rootScope;
 
     public Container(in IEnumerable<ServiceDescriptor> descriptors)
     {
         _descriptors = descriptors.ToImmutableDictionary(d => d.ServiceType);
         _cachedActivators = new();
+        _rootScope = new(this);
     }
 
     public IScope CreateScope()
@@ -50,26 +52,39 @@ public sealed class Container : IContainer
         return _cachedActivators.GetOrAdd(service, BuildActivation(service)).Invoke(scope);
     }
 
-    private T CreateInstance<T>(in IScope scope)
-        => (T)CreateInstance(typeof(T), scope);
+    private ServiceDescriptor FindDescriptor(in Type serviceType)
+    {
+        _descriptors.TryGetValue(serviceType, out var descriptor);
+        return descriptor;
+    }
 
     private sealed class Scope : IScope
     {
         private readonly Container _container;
+        private readonly ConcurrentDictionary<Type, object> _scopedInstances;
 
         public Scope(Container container)
         {
             _container = container;
+            _scopedInstances = new();
         }
 
         public object Resolve(in Type serviceType)
         {
-            return _container.CreateInstance(serviceType, this);
+            ServiceDescriptor descriptor = _container.FindDescriptor(serviceType);
+
+            if (descriptor.LifeTime == LifeTime.Transient)
+                return _container.CreateInstance(serviceType, this);
+
+            if (descriptor.LifeTime == LifeTime.Scoped || _container._rootScope == this)
+                return _scopedInstances.GetOrAdd(serviceType, _container.CreateInstance(serviceType, this));
+            else
+                return _container._rootScope.Resolve(serviceType);
         }
 
         public T Resolve<T>()
         {
-            return _container.CreateInstance<T>(this);
+            return (T)Resolve(typeof(T));
         }
     }
 }

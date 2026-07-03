@@ -2,5 +2,5 @@
 
 public interface IContainer
 {
-
+    IScope CreateScope();
 }

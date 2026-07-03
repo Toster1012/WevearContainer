@@ -1,14 +1,15 @@
 ﻿namespace Wevear;
 
-public class ContainerBuilder : IContainerBuilder
+public sealed class ContainerBuilder : IContainerBuilder
 {
-    public IContainer Build()
+    private readonly List<ServiceDescriptor> _descriptors = new();
+
+    public void Register(ServiceDescriptor serviceDescriptor)
     {
-        throw new NotImplementedException();
+        _descriptors.Add(serviceDescriptor);
     }
 
-    public void Register()
+    public IContainer Build()
     {
-        throw new NotImplementedException();
     }
 }

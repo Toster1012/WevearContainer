@@ -80,21 +80,21 @@ public static class ContainerBuilderExtension
         return containerBuilder;
     }
 
-    public static IContainerBuilder RegisterSingleton(this IContainerBuilder containerBuilder, in Type serviceType, in Func<IScope, object> factory)
-        => containerBuilder.RegisterFactory(serviceType, factory, LifeTime.Single);
+    public static IContainerBuilder RegisterSingleton<TService>(this IContainerBuilder containerBuilder, in Func<IScope, TService> factory)
+        => containerBuilder.RegisterFactory(typeof(TService), factory, LifeTime.Single);
 
-    public static IContainerBuilder RegisterTransient(this IContainerBuilder containerBuilder, in Type serviceType, in Func<IScope, object> factory)
-        => containerBuilder.RegisterFactory(serviceType, factory, LifeTime.Transient);
+    public static IContainerBuilder RegisterTransient<TService>(this IContainerBuilder containerBuilder, in Func<IScope, TService> factory)
+        => containerBuilder.RegisterFactory(typeof(TService), factory, LifeTime.Transient);
 
-    public static IContainerBuilder RegisterScoped(this IContainerBuilder containerBuilder, in Type serviceType, in Func<IScope, object> factory)
-        => containerBuilder.RegisterFactory(serviceType, factory, LifeTime.Scoped);
+    public static IContainerBuilder RegisterScoped<TService>(this IContainerBuilder containerBuilder, in Func<IScope, object> factory)
+        => containerBuilder.RegisterFactory(typeof(TService), factory, LifeTime.Scoped);
 
-    private static IContainerBuilder RegisterFactory(this IContainerBuilder containerBuilder, in Type serviceType, in Func<IScope, object> factory, in LifeTime lifeTime)
+    private static IContainerBuilder RegisterFactory<TService>(this IContainerBuilder containerBuilder, in Type serviceType, Func<IScope, TService> factory, in LifeTime lifeTime)
     {
         containerBuilder.Register(new FactoryBasedServiceDescriptor()
         {
             LifeTime = lifeTime,
-            Factory = factory,
+            Factory = s => factory(s),
             ServiceType = serviceType,
         });
 

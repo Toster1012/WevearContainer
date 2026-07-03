@@ -1,8 +1,12 @@
-﻿var service = new Service();
+﻿using Wevear;
+
+var service = new Service();
 var controller = new Controller(service);
 
-controller.Do();
-
+IContainerBuilder builder = new ContainerBuilder();
+builder.RegisterSingleton<IService, Service>()
+    .RegisterTransient<IHelper, Helper>()
+    .Build();
 
 class Controller(IService service)
 {
@@ -10,6 +14,16 @@ class Controller(IService service)
 
     public void Do() { }
 }
+
+interface IHelper
+{
+
+}
+class Helper : IHelper
+{
+
+}
+
 
 interface IService
 {
